@@ -1,10 +1,12 @@
 'use strict'
 
 var path = require('path');
+var io = require('socket.io');
 var express = require('express');
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var bodyParser = require('body-parser');
+
 
 var app=express();
 app.use(bodyParser.urlencoded({extended: true}));
@@ -47,11 +49,27 @@ app.post('/login',function(req,res){
   console.log('get login q');
   console.log(req.body.username);
   MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-    console.log(db.collection('users').find({"username":req.body.username}).count());
+    console.log(db.collection('users').find({"username":req.body.username}).count(function(err,cnt){
+      console.log(cnt);
+      if(cnt==0){res.sendFile(__dirname+'/login_username.html',function(){res.end();})}
+      else{
+        db.collection('users').find({"pass":req.body.pass}).count(function(err,cnt2){
+          if(cnt2==0){res.sendFile(__dirname+'/login_pass.html',function(){res.end();})}
+          else if(cnt2==1){
+            res.sendFile(__dirname+'/login_pass.html',function(){res.end();})
+          }  
+        });
+      }
+    }));
     console.log(db.collection('users').find().count());
 
   });
  // if(db.users.findOne(req.body.username))
 });
 
+app.post('/message_input',function(req,res){
+  console.log('get n m c:'+req.body.message);
+});
+
 app.listen(3000);
+io.listen(server);

@@ -1,0 +1,13 @@
+<html>
+	<head><title>chatroom</title></head>
+
+	<body>
+		<form method="post" action="/message_input">
+			<input type="text" name="message">
+			<input type="submit" value="submit">
+		</form>
+
+		{{> messages_show}}
+
+	</body>
+</html>
