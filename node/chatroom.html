@@ -2,12 +2,24 @@
 	<head><title>chatroom</title></head>
 
 	<body>
-		<form method="post" action="/message_input">
-			<input type="text" name="message">
-			<input type="submit" value="submit">
-		</form>
+		<input type="text" name="message">
+		<input type="button" value="send" id="sendtext">
 
-		{{> messages_show}}
+<!-- messenger show -->
 
 	</body>
 </html>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+		var socket = io('http://localhost:3001');
+
+window.addEventListener('load',function() { 
+    document.getElementById('sendtext').addEventListener('click',function() {
+        var text = document.getElementById('data').value; 
+        socket.emit('sendchat', text);
+    }, false); 
+}, false);
+
+</script>

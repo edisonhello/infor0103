@@ -56,7 +56,7 @@ app.post('/login',function(req,res){
         db.collection('users').find({"pass":req.body.pass}).count(function(err,cnt2){
           if(cnt2==0){res.sendFile(__dirname+'/login_pass.html',function(){res.end();})}
           else if(cnt2==1){
-            res.sendFile(__dirname+'/login_pass.html',function(){res.end();})
+            res.sendFile(__dirname+'/chatroom.html',function(){res.end();})
           }  
         });
       }
@@ -72,4 +72,3 @@ app.post('/message_input',function(req,res){
 });
 
 app.listen(3000);
-io.listen(server);
