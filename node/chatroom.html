@@ -1,25 +1,50 @@
 <html>
-	<head><title>chatroom</title></head>
+	<head>
+		<title>chatroom</title>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+	<!--	<script src="/static/jQuery/jquery-2.1.4.min.js"></script>-->
+	</head>
 
 	<body>
-		<input type="text" name="message">
-		<input type="button" value="send" id="sendtext">
-
-<!-- messenger show -->
-
+		<input type="text" name="message" id="text">
+		<input type="button" value="send" id="sendtext"><div id="date"></div>
+		<div class="msgs">
+			
+		</div>
 	</body>
 </html>
 
-
-<script src="/socket.io/socket.io.js"></script>
 <script>
-		var socket = io('http://localhost:3001');
+	var socket = io('http://localhost:3000');
+	var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" "+new Date().getHours().toString()+":"+new Date().getMinutes().toString()+":"+new Date().getSeconds().toString();
+	var name;
+	socket.on("who",function(){
+		name = prompt("insert your name");
+		console.log(name);
+		socket.emit('me',name);
+	});
 
-window.addEventListener('load',function() { 
-    document.getElementById('sendtext').addEventListener('click',function() {
-        var text = document.getElementById('data').value; 
-        socket.emit('sendchat', text);
-    }, false); 
-}, false);
+	window.addEventListener('load',function() { 
+	    document.getElementById('sendtext').addEventListener('click',function() {
+	        var text = document.getElementById('text').value; 
+ 	       	socket.emit('sendchat', text, name);
+ 	       	document.getElementById('text').value="";
+ 	   }, false); 
+	}, false);
+
+	socket.on("pubchat",function(text ,sendname ,time){
+		//give text to html
+		console.log(text,sendname);
+		var date=new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" "+new Date().getHours().toString()+":"+new Date().getMinutes().toString()+":"+new Date().getSeconds().toString();
+		$('.msgs').append("<p>"+sendname+" : "+text+'</p>'+'<p style="text-align:right">'
+							   +date+'</p>');
+	});
+
+
+
+	socket.on('now', function(data) {
+        $('#date').text(data.date);
+    });
 
 </script>
