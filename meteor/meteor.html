@@ -5,14 +5,17 @@
 <body>
 	{{> messages_input}}
 	
-
 	{{> messages_show}}
-	
+
 </body>
 
 <template name="messages_input">
-<form action="/addm" method="get">
+<form class="message_form">
 	<input type="text" name="message">
 	<input type="submit" value="submit">
 </form>
+</template>
+
+<template name="messages_show">
+	
 </template>
