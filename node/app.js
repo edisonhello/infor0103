@@ -106,9 +106,14 @@ io.sockets.on('connection', function(socket){
 
 
   setInterval(function() {
-    var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" "+new Date().getHours().toString()+":"+new Date().getMinutes().toString()+":"
-    if(new Date().getSeconds()<10){var nnow=now+"0"+Date().getSeconds().toString()}
-    socket.emit('now', {'date':nnow});
+    var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" ";
+    if(new Date().getHours()<10){var nnow=now+"0"+new Date().getHours().toString()+":";}
+      else{var nnow=now+new Date().getHours().toString()+":";}
+    if(new Date().getMinutes()<10){var nnnow=nnow+"0"+new Date().getMinutes().toString()+":";}
+      else{var nnnow=nnow+new Date().getMinutes().toString()+":";}
+    if(new Date().getSeconds()<10){var nnnnow=nnnow+"0"+new Date().getSeconds().toString();}
+      else{var nnnnow=nnnow+new Date().getSeconds().toString();}
+    socket.emit('now', {'date':nnnnow});
   }, 1000);
 });
 
