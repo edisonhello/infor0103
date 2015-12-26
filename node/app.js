@@ -26,6 +26,8 @@ app.use('/static', express.static('static'));
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+MongoClient.createCollection('users');
+
 app.get('/add.html',function(req,res){
     res.sendFile(__dirname+'/form.html',function(){res.end();})
 });
@@ -83,23 +85,19 @@ io.sockets.on('connection', function(socket){
 
   socket.on('regq',function(username,pass,pass2,email,birth){
     MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-      var cnt=db.collection('users').find({"username":username}).count(function(cnt){
-        if(cnt){io.emit('usernameq');}
-        else{
+      console.log("come2");
+      db.collection('users').find({"username":username}).count(function(cnt){
+        if(cnt){io.emit('usernameq');console.log("come3");}
+        else{console.log("come4");
            db.collection('users').insertOne({"username":username,"pass":pass,"pass2":pass2,"email":email,"birth":birth});
+           console.log(cnt)
            io.emit('jumpmain');
+           console.log("come6")
         }
       });
     });
   });
 
 });
-
-MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-  db.collection('users').remove(function(){
-    db.collection('users').insertOne({"username":"a","pass":"b"})
-  });
-});
-
 
 server.listen(3000);

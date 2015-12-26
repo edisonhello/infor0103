@@ -70,6 +70,8 @@
             document.getElementById('pass').value="";
             document.getElementById('pass2').value="";
           }else{
+            console.log("come to here");
+            $('#ques').text("");
             socket.emit('regq',username,pass,pass2,email,birth);
           }
      }, false); 
