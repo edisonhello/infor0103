@@ -26,7 +26,7 @@ app.use('/static', express.static('static'));
 
 app.use(bodyParser.urlencoded({extended: true}));
 
-MongoClient.createCollection('users');
+//MongoClient.createCollection('users');
 
 app.get('/add.html',function(req,res){
     res.sendFile(__dirname+'/form.html',function(){res.end();})
@@ -86,7 +86,7 @@ io.sockets.on('connection', function(socket){
   socket.on('regq',function(username,pass,pass2,email,birth){
     MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
       console.log("come2");
-      db.collection('users').find({"username":username}).count(function(cnt){
+      db.collection('users').find({"username":username}).count(function(err,cnt){
         if(cnt){io.emit('usernameq');console.log("come3");}
         else{console.log("come4");
            db.collection('users').insertOne({"username":username,"pass":pass,"pass2":pass2,"email":email,"birth":birth});
