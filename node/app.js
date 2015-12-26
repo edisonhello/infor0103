@@ -40,24 +40,30 @@ app.get('/login.html',function(req,res){
 //app.get('/login', function(){})
 app.post('/reg',function(req,res){
   console.log("got post");
-	if(req.body.pass!=req.body.pass2){
-    console.log("pass q");
-		res.sendFile(__dirname+'/form_pass.html',function(){res.end();})
-  }
-  else{
-    if(req.body.birth==""){
-      console.log("bir q");
-      res.sendFile(__dirname+'/form_birth.html',function(){res.end();})
-   }else{
-     console.log("no f q");
-     MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-      console.log(req.body);
-      db.collection('users').insertOne(req.body);
-      console.log('no db q');
-    });
-     res.sendFile(__dirname+'/done.html',function(){res.end();})
-   }
-  }
+  db.collection('users').find({"username":req.body.username}).count(function(err,cnt){
+    if(cnt>=1){
+      res.sendFile(__dirname+'/form_username.html',function(){res.end();})
+    }else{
+	    if(req.body.pass!=req.body.pass2){
+        console.log("pass q");
+		    res.sendFile(__dirname+'/form_pass.html',function(){res.end();})
+      }
+      else{
+        if(req.body.birth==""){
+          console.log("bir q");
+          res.sendFile(__dirname+'/form_birth.html',function(){res.end();})
+       }else{
+         console.log("no f q");
+         MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
+          console.log(req.body);
+          db.collection('users').insertOne(req.body);
+          console.log('no db q');
+        });
+        res.sendFile(__dirname+'/done.html',function(){res.end();})
+        }
+      }
+    }
+  });
 });
 
 app.post('/login',function(req,res){
