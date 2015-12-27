@@ -102,15 +102,26 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('loginq',function(username,pass){
-    db.collection('users').find({"username":username}).count(function(err,cnt){
-      if(cnt==0){io.emit("nou");}
-      else{
-        db.collection('users').find({"username":username,"pass":pass}),count(function(err,cnt){
-          if(cnt){io.emit("logindone");}
-          else{io.emit('wp')}
-        });
-      }
+    console.log("in");
+    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
+      db.collection('users').find({"username":username}).count(function(err,cnt){
+        if(cnt==0){io.emit("nou");}
+        else{
+          db.collection('users').find({"username":username,"pass":pass}).count(function(err,cnt){
+            if(cnt){
+              db.collection('users').findOne({"username":username,"pass":pass},function(err,data){
+                console.log(data);
+//                console.log(data."nickname");////////////////////////////////////////////////////////////
+                io.emit("logindone" , data["nickname"]);
+              })
+
+            }
+            else{io.emit('wp')}
+          });
+        }
+      });
     });
+
   });
 });
 

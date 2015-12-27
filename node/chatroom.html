@@ -3,23 +3,54 @@
 		<title>chatroom</title>
   	 		<script src="/socket.io/socket.io.js"></script>
    			<script src="/static/jQuery/jquery-2.1.4.min.js"></script>
+   			<style>
+				#all {
+					max-width: 800px;
+				}
+				#chatarea , #loginarea {
+					position: fixed;
+					bottom: 20px;
+					left: 20px;
+				}
+				#date {
+					position: fixed;
+					bottom: 20px;
+					right: 10px;
+				}
+				#wrn {
+					position: fixed;
+					bottom: 100px;
+					left: 60px;
+				}
+				.button {
+					position: relative;
+					left: 235px;
+					bottom: 26px;
+				}
+				#pass {
+					position: relative;
+					left: 3px;
+				}
+				.button2 {
+					position: relative;
+					left: 0;
+					bottom: 0;
+				}
+   			</style>
 	</head>
 
 	<body>
-		<div id="chatarea">
-
-		</div>
-		<div id="loginarea">
-
-		</div>
-		<div id="wrn" style="color:red;font-size:20px">
+		<div id="all">
 			
-		</div>
+			<div id="wrn" style="color:red;font-size:20px"></div>
 
-		<div id="date"></div>
-		<div class="msgs">
-
+			<div id="chatarea"></div>
+			<div id="loginarea"></div>
 			
+
+			<div id="date"></div>
+			<div class="msgs"></div>
+
 		</div>
 	</body>
 </html>
@@ -30,7 +61,7 @@
 	var username;
 	var nickname;
 	socket.on("who",function(){
-		$('#loginarea').append('<input type="text" name="username" id="username"><br><input type="password" name="pass" id="pass"><br><input type="button" id="login" value="login">');
+		$('#loginarea').append('username : <input type="text" name="username" id="username" style="width:195px"><br>password : <input type="password" name="pass" id="pass" style="width:150px"><br><input type="button" onclick="loginfunction()" value="login" class="button">');
 	});
 
 	socket.on('nou',function(){
@@ -39,44 +70,39 @@
 		document.getElementById('pass').value="";
 	});
 
-	socket.on('logindone',function(){
+	socket.on('wp',function(){
+		$('#wrn').text('wrong password');
+		document.getElementById('pass').value="";
+	});;
+
+	socket.on('logindone',function(nickname){
 		$('#loginarea').remove();
-		$('#chatarea').append('<input type="text" name="message" id="text"><input type="button" value="send" id="sendtext">');
+		$('#chatarea').append('<input type="text" name="message" id="text"><input type="button" value="send" onclick="sendtextfunction()" class="button2">');
 		$('#wrn').text('');
 	})
 
-	$('#sendtext').click(function(){
+	var sendtextfunction = function(){
 		var text = document.getElementById('text').value; 
- 	  	socket.emit('sendchat', text, nickname);
+		if(text!=""){
+			socket.emit('sendchat', text, nickname);
+		}
       	document.getElementById('text').value="";
-	});
+	};
 
-	$('#login').click(function(){
+	var loginfunction = function(){
 		console.log("in");
 		var username = document.getElementById('username').value; 
 	    var pass = document.getElementById('pass').value;
+	    console.log(username);
  	    socket.emit('loginq',username,pass);
  	    document.getElementById('pass').value="";
- 	});
-
-/*	window.addEventListener('load',function() { 
-	    document.getElementById('sendtext').addEventListener('click',function() {
- 	   }, false); 
-	}, false);*/
-
-/*	window.addEventListener('load',function() { 
-	    document.getElementById('login').addEventListener('click',function() {
-	    	console.log("dec")
-
- 	   }, false); 
-	}, false);*/
+ 	};
 
 	socket.on("pubchat",function(text ,sendname ,time){
 		//give text to html
 		console.log(text,sendname);
-		var date=new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" "+new Date().getHours().toString()+":"+new Date().getMinutes().toString()+":"+new Date().getSeconds().toString();
-		$('.msgs').append("<p>"+sendname+" : "+text+'</p>'+'<p style="text-align:right">'
-							   +date+'</p>');
+		$('.msgs').append("<p>"+sendname+" : "+text+'</p>'+'<p style="text-align:right;font-size:12px;color:#aaaaaa;top:-10px">'
+							   +time+'</p>');
 	});
 
 	socket.on('now', function(data) {
