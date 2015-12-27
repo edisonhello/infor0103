@@ -3,18 +3,16 @@
 <html>
   <head>
     <title>regist(?)</title>
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-  <!--  <script src="/static/jQuery/jquery-2.1.4.min.js"></script>-->
-    <style>
-    </style>
+    <script src="/static/jQuery/jquery-2.1.4.min.js"></script>
   </head>
   <body>
 
-  <div id="ques" style="color:red;font-size:16px"></div>
-
+  <div id="ques" style="color:red;font-size:20px"></div>
+    
     <form>
     username : <input type="text" name="username" id="username"><br>
+    nickname : <input type="text" name="nickname" id="nickname"><br>
     password : <input type="password" name="pass" id="pass"><br>
     please confirm your password : <input type="password" name="pass2" id="pass2"><br>
     email : <input type="email" name="email" id="email"><br>
@@ -37,6 +35,7 @@
   window.addEventListener('load',function() { 
       document.getElementById('submit').addEventListener('click',function() {
           var username = document.getElementById('username').value; 
+          var nickname = document.getElementById('nickname').value; 
           var pass = document.getElementById('pass').value; 
           var pass2 = document.getElementById('pass2').value; 
           var email = document.getElementById('email').value; 
@@ -44,6 +43,10 @@
 
           if(username==""){
             $('#ques').text("username is empty");
+            document.getElementById('pass2').value="";
+          }
+          else if(nickname==""){
+            $('#ques').text("nickname is empty");
             document.getElementById('pass2').value="";
           }
           else if(pass==""){
@@ -54,7 +57,7 @@
             $('#ques').text("password confirm is empty");
           }
           else if(email==""){
-            $('#ques').text("<email is empty");
+            $('#ques').text("email is empty");
             document.getElementById('pass2').value="";
           }
           else if(birth==""){
@@ -72,7 +75,7 @@
           }else{
             console.log("come to here");
             $('#ques').text("");
-            socket.emit('regq',username,pass,pass2,email,birth);
+            socket.emit('regq',username,nickname,pass,pass2,email,birth);
           }
      }, false); 
   }, false);
@@ -84,9 +87,15 @@
     $('#ques').text("username has been taken");
   });
 
+  socket.on('nickq',function(){
+    document.getElementById('nickname').value=""
+    $('#ques').text("nickname has been taken");
+  });
+
   socket.on('jumpmain',function(){
     if(cnta==0){
-      $('#done').append('<a href="http://localhost:3000">return to home</a>')
+      $('#done').append('<a href="http://localhost:3000/chat.html">go to chatroom!</a>');
+      cnta=cnta+1;
     }
   })
 </script>
