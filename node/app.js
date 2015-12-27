@@ -56,13 +56,6 @@ io.sockets.on('connection', function(socket){
   var id=socket.id;
   socket.emit("who");
 
-  socket.on('me', function(name){
-    if(name=="null"){socket.emit("who");}
-    console.log("id:"+id+"name:"+name);
-    var userdata={"id":id , "name":name};
-    users.push(userdata);
-  });
-
   socket.on('sendchat', function(text,name){
     var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" ";
     if(new Date().getHours()<10){var nnow=now+"0"+new Date().getHours().toString()+":";}
@@ -109,41 +102,14 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('loginq',function(username,pass){
-    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-      db.collection('users').find({"username":username}).count(function(err,cnt){
-        if(cnt==0){io.emit('nou');}
-        else{
-          db.collection('users').find({"username":username,"pass":pass}).count(function(err,cnt2){
-            if(cnt==0){io.emit('psw');}
-            else{
-              io.emit("gochat");
-            }
-          })
-        }
-      });
-    });
-  });
-
-  socket.on('userusername',function(username){
-    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-      db.collection('users').find({"username":username}).count(function(err,cnt){
-        if(cnt==0){io.emit('nou');}
-        else{io.emit('inp');}
-      });
-    });
-  });
-
-  socket.on('userpass',function(username,pass){
-    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-      db.collection('users').find({"username":username,"pass":pass}).count(function(err,cnt){
-        if(cnt==0){io.emit('wp');}
-        else{
-          db.collection('users').findOne({"username":username,"pass":pass} , function(err,info){
-//            console.log(info);
-            io.emit('rp',info.nickname)
-          })
-        }
-      });
+    db.collection('users').find({"username":username}).count(function(err,cnt){
+      if(cnt==0){io.emit("nou");}
+      else{
+        db.collection('users').find({"username":username,"pass":pass}),count(function(err,cnt){
+          if(cnt){io.emit("logindone");}
+          else{io.emit('wp')}
+        });
+      }
     });
   });
 });
