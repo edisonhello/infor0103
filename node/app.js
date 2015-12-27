@@ -47,10 +47,6 @@ app.post('/gochat',function(req,res){
   res.sendFile(__dirname+'/chatroom.html',function(){res.end();})
 });
 
-app.post('/message_input',function(req,res){
-  console.log('get n m c:'+req.body.message);
-});
-
 
 io.sockets.on('connection', function(socket){
   var id=socket.id;
@@ -66,6 +62,7 @@ io.sockets.on('connection', function(socket){
       else{var nnnnow=nnnow+new Date().getSeconds().toString();}
     console.log(text+" "+name+" "+nnnnow);
     io.emit("pubchat", text, name ,nnnnow);
+    db.collection('messages').insertOne({"sendby":name,"text":text,"time":nnnnow});
   });
 
 
@@ -82,18 +79,14 @@ io.sockets.on('connection', function(socket){
 
   socket.on('regq',function(username,nickname,pass,pass2,email,birth){
     MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
-      console.log("come2");
       db.collection('users').find({"username":username}).count(function(err,cnt){
         if(cnt){io.emit('usernameq');}
         else{
           db.collection('users').find({"nickname":nickname}).count(function(err,cnt2){
             if(cnt2){io.emit('nickq');}
             else{
-              console.log("come4");
               db.collection('users').insertOne({"username":username,"nickname":nickname,"pass":pass,"pass2":pass2,"email":email,"birth":birth});
-              console.log(cnt)
               io.emit('jumpmain');
-              console.log("come6")
             }
           });
         }
@@ -102,7 +95,7 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('loginq',function(username,pass){
-    console.log("in");
+
     MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
       db.collection('users').find({"username":username}).count(function(err,cnt){
         if(cnt==0){io.emit("nou");}
@@ -110,18 +103,14 @@ io.sockets.on('connection', function(socket){
           db.collection('users').find({"username":username,"pass":pass}).count(function(err,cnt){
             if(cnt){
               db.collection('users').findOne({"username":username,"pass":pass},function(err,data){
-                console.log(data);
-//                console.log(data."nickname");////////////////////////////////////////////////////////////
-                io.emit("logindone" , data["nickname"]);
-              })
-
+                io.emit("logindone" , data.nickname);
+              });
             }
             else{io.emit('wp')}
           });
         }
       });
     });
-
   });
 });
 

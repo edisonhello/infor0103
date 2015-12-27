@@ -5,7 +5,10 @@
    			<script src="/static/jQuery/jquery-2.1.4.min.js"></script>
    			<style>
 				#all {
-					max-width: 800px;
+					margin: 0 auto;
+					max-width: 500px;
+					left: 20px;
+					top: 20px;
 				}
 				#chatarea , #loginarea {
 					position: fixed;
@@ -15,7 +18,7 @@
 				#date {
 					position: fixed;
 					bottom: 20px;
-					right: 10px;
+					right: 20px;
 				}
 				#wrn {
 					position: fixed;
@@ -35,6 +38,21 @@
 					position: relative;
 					left: 0;
 					bottom: 0;
+				}
+				.msgs .time {
+					font-size: 12px;
+					color: #aaaaaa;
+					text-align: right;
+					position: relative;
+					top: -10px
+				}
+				.msgs .mes{
+					position: relative;
+					height: 0;
+				}
+				.msgs {
+					position: relative;
+					max-width: 500px;
 				}
    			</style>
 	</head>
@@ -75,7 +93,8 @@
 		document.getElementById('pass').value="";
 	});;
 
-	socket.on('logindone',function(nickname){
+	socket.on('logindone',function(nick){
+		nickname=nick;
 		$('#loginarea').remove();
 		$('#chatarea').append('<input type="text" name="message" id="text"><input type="button" value="send" onclick="sendtextfunction()" class="button2">');
 		$('#wrn').text('');
@@ -90,19 +109,15 @@
 	};
 
 	var loginfunction = function(){
-		console.log("in");
 		var username = document.getElementById('username').value; 
 	    var pass = document.getElementById('pass').value;
-	    console.log(username);
  	    socket.emit('loginq',username,pass);
  	    document.getElementById('pass').value="";
  	};
 
 	socket.on("pubchat",function(text ,sendname ,time){
 		//give text to html
-		console.log(text,sendname);
-		$('.msgs').append("<p>"+sendname+" : "+text+'</p>'+'<p style="text-align:right;font-size:12px;color:#aaaaaa;top:-10px">'
-							   +time+'</p>');
+		$('.msgs').append("<p class='mes'>"+sendname+" : "+text+'</p>'+'<p class="time">'+time+'</p>');
 	});
 
 	socket.on('now', function(data) {
