@@ -61,8 +61,10 @@ io.sockets.on('connection', function(socket){
     if(new Date().getSeconds()<10){var nnnnow=nnnow+"0"+new Date().getSeconds().toString();}
       else{var nnnnow=nnnow+new Date().getSeconds().toString();}
     console.log(text+" "+name+" "+nnnnow);
-    io.emit("pubchat", text, name ,nnnnow);
-    db.collection('messages').insertOne({"sendby":name,"text":text,"time":nnnnow});
+    socket.emit("pubchat", text, name ,nnnnow);
+    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
+      db.collection('messages').insertOne({"sendby":name,"text":text,"time":nnnnow});
+    });
   });
 
 
@@ -74,19 +76,19 @@ io.sockets.on('connection', function(socket){
       else{var nnnow=nnow+new Date().getMinutes().toString()+":";}
     if(new Date().getSeconds()<10){var nnnnow=nnnow+"0"+new Date().getSeconds().toString();}
       else{var nnnnow=nnnow+new Date().getSeconds().toString();}
-    socket.emit('now', {'date':nnnnow});
+    io.emit('now', {'date':nnnnow});
   }, 1000);
 
   socket.on('regq',function(username,nickname,pass,pass2,email,birth){
     MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
       db.collection('users').find({"username":username}).count(function(err,cnt){
-        if(cnt){io.emit('usernameq');}
+        if(cnt){socket.emit('usernameq');}
         else{
           db.collection('users').find({"nickname":nickname}).count(function(err,cnt2){
-            if(cnt2){io.emit('nickq');}
+            if(cnt2){socket.emit('nickq');}
             else{
               db.collection('users').insertOne({"username":username,"nickname":nickname,"pass":pass,"pass2":pass2,"email":email,"birth":birth});
-              io.emit('jumpmain');
+              socket.emit('jumpmain');
             }
           });
         }
@@ -95,18 +97,17 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('loginq',function(username,pass){
-
     MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
       db.collection('users').find({"username":username}).count(function(err,cnt){
-        if(cnt==0){io.emit("nou");}
+        if(cnt==0){socket.emit("nou");}
         else{
           db.collection('users').find({"username":username,"pass":pass}).count(function(err,cnt){
             if(cnt){
               db.collection('users').findOne({"username":username,"pass":pass},function(err,data){
-                io.emit("logindone" , data.nickname);
+                socket.emit("logindone" , data.nickname);
               });
             }
-            else{io.emit('wp')}
+            else{socket.emit('wp')}
           });
         }
       });

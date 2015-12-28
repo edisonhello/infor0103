@@ -75,11 +75,18 @@
 
 <script>
 	var socket = io('http://localhost:3000');
+
+	var cntlog=0;
+	var cntchat=0;
+
 	var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" "+new Date().getHours().toString()+":"+new Date().getMinutes().toString()+":"+new Date().getSeconds().toString();
 	var username;
 	var nickname;
 	socket.on("who",function(){
-		$('#loginarea').append('username : <input type="text" name="username" id="username" style="width:195px"><br>password : <input type="password" name="pass" id="pass" style="width:150px"><br><input type="button" onclick="loginfunction()" value="login" class="button">');
+		if(cntlog==0){
+			$('#loginarea').append('username : <input type="text" name="username" id="username" style="width:195px"><br>password : <input type="password" name="pass" id="pass" style="width:150px"><br><input type="button" onclick="loginfunction()" value="login" class="button">');
+			cntlog=cntlog+1;
+		}
 	});
 
 	socket.on('nou',function(){
@@ -96,7 +103,10 @@
 	socket.on('logindone',function(nick){
 		nickname=nick;
 		$('#loginarea').remove();
-		$('#chatarea').append('<input type="text" name="message" id="text"><input type="button" value="send" onclick="sendtextfunction()" class="button2">');
+		if(cntchat==0){
+			$('#chatarea').append('<input type="text" name="message" id="text"><input type="button" value="send" onclick="sendtextfunction()" class="button2">');
+			cntchat=cntchat+1;
+		}
 		$('#wrn').text('');
 	})
 
