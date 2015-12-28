@@ -31,7 +31,7 @@
   </body>
 </html>
 <script>
-  var socket = io('http://localhost:3000');
+  var socket = io('http://210.71.78.201:3000');
 
   var cnta=0;
 
@@ -97,7 +97,7 @@
 
   socket.on('jumpmain',function(){
     if(cnta==0){
-      $('#done').append('<a href="http://localhost:3000/chat.html">go to chatroom!</a>');
+      $('#done').append('<a href="http://210.71.78.201:3000/chat.html">go to chatroom!</a>');
       cnta=cnta+1;
     }
   })

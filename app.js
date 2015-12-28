@@ -12,16 +12,6 @@ var io = require('socket.io')(server);
 
 var http = require('http');
 
-var users = [];
-//var express = require('express');
-//var app     = express();
-//var server  = app.listen(3000);
-//var io      = require('socket.io').listen(server);
-
-
-//var server = app.listen(3000);
-//var io = sio.listen(server);
-
 app.use('/static', express.static(__dirname+'/static'));
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -43,7 +33,7 @@ app.get('/chat.html',function(req,res){
   res.sendFile(__dirname+'/chatroom.html',function(){res.end();})
 })
 
-MongoClient.connect('mongodb://127.0.0.1:27017',function(err,db){
+MongoClient.connect('mongodb://210.71.78.201:27017',function(err,db){
   db.createCollection('users');
 });
 
@@ -61,7 +51,7 @@ io.sockets.on('connection', function(socket){
       else{var nnnnow=nnnow+new Date().getSeconds().toString();}
     console.log(text+" "+name+" "+nnnnow);
     socket.emit("pubchat", text, name ,nnnnow);
-    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
+    MongoClient.connect('mongodb://210.71.78.201:27017/users',function(err,db){
       db.collection('messages').insertOne({"sendby":name,"text":text,"time":nnnnow});
     });
   });
@@ -79,7 +69,7 @@ io.sockets.on('connection', function(socket){
   }, 1000);
 
   socket.on('regq',function(username,nickname,pass,pass2,email,birth){
-    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
+    MongoClient.connect('mongodb://210.71.78.201:27017/users',function(err,db){
       db.collection('users').find({"username":username}).count(function(err,cnt){
         if(cnt){socket.emit('usernameq');}
         else{
@@ -96,7 +86,7 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('loginq',function(username,pass){
-    MongoClient.connect('mongodb://127.0.0.1:27017/users',function(err,db){
+    MongoClient.connect('mongodb://210.71.78.201:27017/users',function(err,db){
       db.collection('users').find({"username":username}).count(function(err,cnt){
         if(cnt==0){socket.emit("nou");}
         else{
