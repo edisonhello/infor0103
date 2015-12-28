@@ -3,27 +3,103 @@
 <html>
   <head>
     <title>regist(?)</title>
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-  <!--  <script src="/static/jQuery/jquery-2.1.4.min.js"></script>-->
+    <script src="/static/jQuery/jquery-2.1.4.min.js"></script>
+    <style>
+      
+    </style>
   </head>
   <body>
-    <form action="/reg" method="post">
-    username : <input type="text" name="username"><br>
-    password : <input type="password" name="pass"><br>
-    please confirm your password : <input type="password" name="pass2"><br>
-    email : <input type="email" name="email"><br>
-    birthday : <input type="date" name="birth"><br>
+
+  <div id="ques" style="color:red;font-size:20px"></div>
     
-    <input type="reset" value="reset">
-    <input type="submit" value="Submit">
+    <form>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;username : <input type="text" id="username"><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nickname : <input type="text" id="nickname"><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;password : <input type="password" id="pass"><br>
+    please confirm your password : <input type="password" id="pass2"><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;email : <input type="email" id="email"><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;birthday : <input type="date" id="birth"><br>
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" value="reset">
+    <input type="button" value="Submit" id="submit">
 
     </form>
 
+    <div id="done"></div>
+
   </body>
 </html>
-
 <script>
-  
+  var socket = io('http://localhost:3000');
 
+  var cnta=0;
+
+  window.addEventListener('load',function() { 
+    document.getElementById('submit').addEventListener('click',function() {
+      var username = document.getElementById('username').value; 
+      var nickname = document.getElementById('nickname').value; 
+      var pass = document.getElementById('pass').value; 
+      var pass2 = document.getElementById('pass2').value; 
+      var email = document.getElementById('email').value; 
+      var birth = document.getElementById('birth').value; 
+
+      if(username==""){
+        $('#ques').text("username is empty");
+        document.getElementById('pass2').value="";
+      }
+      else if(nickname==""){
+        $('#ques').text("nickname is empty");
+        document.getElementById('pass2').value="";
+      }
+      else if(pass==""){
+         $('#ques').text("password is empty");
+        document.getElementById('pass2').value="";
+       }
+      else if(pass2==""){
+         $('#ques').text("password confirm is empty");
+       }
+      else if(email==""){
+        $('#ques').text("email is empty");
+        document.getElementById('pass2').value="";
+      }
+       else if(birth==""){
+        $('#ques').text("birthday is empty");
+         document.getElementById('pass2').value="";
+       }
+      else if(pass!=pass2){
+         $('#ques').text("passwords are not alike");
+         document.getElementById('pass').value="";
+         document.getElementById('pass2').value="";
+      }else if(pass.length<8){
+        $('#ques').text("password is too short! (at least 8)");
+        document.getElementById('pass').value="";
+        document.getElementById('pass2').value="";
+       }else{
+        console.log("come to here");
+        $('#ques').text("");
+         socket.emit('regq',username,nickname,pass,pass2,email,birth);
+       }
+     }, false); 
+  }, false);
+
+  socket.on('usernameq',function(){
+    document.getElementById('username').value="";
+    document.getElementById('pass').value="";
+    document.getElementById('pass2').value="";
+    $('#ques').text("username has been taken");
+  });
+
+  socket.on('nickq',function(){
+    document.getElementById('nickname').value=""
+    $('#ques').text("nickname has been taken");
+  });
+
+  socket.on('jumpmain',function(){
+    if(cnta==0){
+      $('#done').append('<a href="http://localhost:3000/chat.html">go to chatroom!</a>');
+      cnta=cnta+1;
+    }
+  })
 </script>
+
