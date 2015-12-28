@@ -43,10 +43,6 @@ app.get('/chat.html',function(req,res){
   res.sendFile(__dirname+'/chatroom.html',function(){res.end();})
 })
 
-app.post('/gochat',function(req,res){
-  res.sendFile(__dirname+'/chatroom.html',function(){res.end();})
-});
-
 MongoClient.connect('mongodb://127.0.0.1:27017',function(err,db){
   db.createCollection('users');
 });
