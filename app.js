@@ -4,7 +4,7 @@ var path = require('path');
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var bodyParser = require('body-parser');
-
+var fs = require('fs');
 var express = require('express')
 var app = require('express')();
 var server = require('http').Server(app);
@@ -33,16 +33,18 @@ app.get('/chat.html',function(req,res){
   res.sendFile(__dirname+'/chatroom.html',function(){res.end();})
 })
 
-MongoClient.connect('mongodb://210.71.78.201:27017',function(err,db){
-  db.createCollection('users');
-});
+//MongoClient.connect('mongodb://localhost:27017',function(err,db){
+  //console.log(db);
+  //db.collection('users').insert({"a":"b"});  
+//});
 
 io.sockets.on('connection', function(socket){
   var id=socket.id;
   socket.emit("who");
 
   socket.on('sendchat', function(text,name){
-    var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" ";
+    var month = new Date().getMonth()+1;
+    var now = new Date().getFullYear().toString()+"-"+month.toString()+"-"+new Date().getDate().toString()+" ";
     if(new Date().getHours()<10){var nnow=now+"0"+new Date().getHours().toString()+":";}
       else{var nnow=now+new Date().getHours().toString()+":";}
     if(new Date().getMinutes()<10){var nnnow=nnow+"0"+new Date().getMinutes().toString()+":";}
@@ -50,10 +52,17 @@ io.sockets.on('connection', function(socket){
     if(new Date().getSeconds()<10){var nnnnow=nnnow+"0"+new Date().getSeconds().toString();}
       else{var nnnnow=nnnow+new Date().getSeconds().toString();}
     console.log(text+" "+name+" "+nnnnow);
-    socket.emit("pubchat", text, name ,nnnnow);
-    MongoClient.connect('mongodb://210.71.78.201:27017/users',function(err,db){
-      db.collection('messages').insertOne({"sendby":name,"text":text,"time":nnnnow});
+    io.emit("pubchat", text, name ,nnnnow);
+    MongoClient.connect('mongodb://localhost:27017/users',function(err,db){
+      db.collection('messages').insert({"sendby":name,"text":text,"time":nnnnow});
     });
+    var something = "text :"+text+", sendby :"+name+", time :"+nnnnow;
+    fs.writeFile(__dirname+'message',something,function(err){
+      console.log(something);  
+      if(err){
+        throw err;
+      }
+    })
   });
 
 
@@ -69,7 +78,7 @@ io.sockets.on('connection', function(socket){
   }, 1000);
 
   socket.on('regq',function(username,nickname,pass,pass2,email,birth){
-    MongoClient.connect('mongodb://210.71.78.201:27017/users',function(err,db){
+    MongoClient.connect('mongodb://localhost:27017/users',function(err,db){
       db.collection('users').find({"username":username}).count(function(err,cnt){
         if(cnt){socket.emit('usernameq');}
         else{
@@ -86,7 +95,7 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('loginq',function(username,pass){
-    MongoClient.connect('mongodb://210.71.78.201:27017/users',function(err,db){
+    MongoClient.connect('mongodb://localhost:27017/users',function(err,db){
       db.collection('users').find({"username":username}).count(function(err,cnt){
         if(cnt==0){socket.emit("nou");}
         else{
