@@ -4,7 +4,7 @@ var path = require('path');
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var bodyParser = require('body-parser');
-var fs = require('fs');
+
 var express = require('express')
 var app = require('express')();
 var server = require('http').Server(app);
@@ -41,6 +41,7 @@ app.get('/chat.html',function(req,res){
 io.sockets.on('connection', function(socket){
   var id=socket.id;
   socket.emit("who");
+  var nn;
 
   socket.on('sendchat', function(text,name){
     var month = new Date().getMonth()+1;
@@ -57,17 +58,12 @@ io.sockets.on('connection', function(socket){
       db.collection('messages').insert({"sendby":name,"text":text,"time":nnnnow});
     });
     var something = "text :"+text+", sendby :"+name+", time :"+nnnnow;
-    fs.writeFile(__dirname+'message',something,function(err){
-      console.log(something);  
-      if(err){
-        throw err;
-      }
-    })
   });
 
 
   setInterval(function() {
-    var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" ";
+    var month = new Date().getMonth()+1;
+    var now = new Date().getFullYear().toString()+"-"+month.toString()+"-"+new Date().getDate().toString()+" ";
     if(new Date().getHours()<10){var nnow=now+"0"+new Date().getHours().toString()+":";}
       else{var nnow=now+new Date().getHours().toString()+":";}
     if(new Date().getMinutes()<10){var nnnow=nnow+"0"+new Date().getMinutes().toString()+":";}
@@ -102,7 +98,21 @@ io.sockets.on('connection', function(socket){
           db.collection('users').find({"username":username,"pass":pass}).count(function(err,cnt){
             if(cnt){
               db.collection('users').findOne({"username":username,"pass":pass},function(err,data){
-                socket.emit("logindone" , data.nickname);
+                nn=data.nickname;
+                socket.emit("logindone" , nn);
+                console.log(nn+" join to chat");
+                var month = new Date().getMonth()+1;
+                var now = new Date().getFullYear().toString()+"-"+month.toString()+"-"+new Date().getDate().toString()+" ";
+                if(new Date().getHours()<10){var nnow=now+"0"+new Date().getHours().toString()+":";}
+                  else{var nnow=now+new Date().getHours().toString()+":";}
+                if(new Date().getMinutes()<10){var nnnow=nnow+"0"+new Date().getMinutes().toString()+":";}
+                  else{var nnnow=nnow+new Date().getMinutes().toString()+":";}
+                if(new Date().getSeconds()<10){var nnnnow=nnnow+"0"+new Date().getSeconds().toString();}
+                  else{var nnnnow=nnnow+new Date().getSeconds().toString();}
+                io.emit("sbc",nn, nnnnow);
+                MongoClient.connect('mongodb://localhost:27017/users',function(err,db){
+                  db.collection('messages').insert({"sendby":nn,"text":"join the chat","time":nnnnow});
+                });
               });
             }
             else{socket.emit('wp')}
@@ -110,6 +120,22 @@ io.sockets.on('connection', function(socket){
         }
       });
     });
+  });
+
+  socket.on('disconnect',function(){
+    var month = new Date().getMonth()+1;
+    var now = new Date().getFullYear().toString()+"-"+month.toString()+"-"+new Date().getDate().toString()+" ";
+    if(new Date().getHours()<10){var nnow=now+"0"+new Date().getHours().toString()+":";}
+      else{var nnow=now+new Date().getHours().toString()+":";}
+    if(new Date().getMinutes()<10){var nnnow=nnow+"0"+new Date().getMinutes().toString()+":";}
+      else{var nnnow=nnow+new Date().getMinutes().toString()+":";}
+    if(new Date().getSeconds()<10){var nnnnow=nnnow+"0"+new Date().getSeconds().toString();}
+      else{var nnnnow=nnnow+new Date().getSeconds().toString();}
+    io.emit('leave',nn,nnnnow);
+    MongoClient.connect('mongodb://localhost:27017/users',function(err,db){
+      db.collection('messages').insert({"sendby":nn,"text":"leave the chat","time":nnnnow});
+    });
+    console.log(nn+" leave the chat");
   });
 });
 

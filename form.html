@@ -6,8 +6,20 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/static/jQuery/jquery-2.1.4.min.js"></script>
     <style>
+      #all {
+        margin: 0 auto;
+        max-width: 500px;
+      }
       .form {
-        text-align=right;
+        text-align: right;
+        position: fixed;
+      }
+      .input {
+        max-width: 145px;
+      }
+      .button {
+        position: relative;
+ 	right: 88px;
       }
     </style>
   </head>
@@ -17,15 +29,15 @@
     
     <div class="form">
       <form>
-      username : <input type="text" id="username"><br>
-      nickname : <input type="text" id="nickname"><br>
-      password : <input type="password" id="pass"><br>
-      please confirm your password : <input type="password" id="pass2"><br>
-      email : <input type="email" id="email"><br>
-      birthday : <input type="date" id="birth"><br>
+      username : <input type="text" id="username" class="input"><br>
+      nickname : <input type="text" id="nickname" class="input"><br>
+      password : <input type="password" id="pass" class="input"><br>
+      please confirm your password : <input type="password" id="pass2" class="input"><br>
+      email : <input type="email" id="email" class="input"><br>
+      birthday : <input type="date" id="birth" class="input"><br>
     
-      <input type="reset" value="reset">
-      <input type="button" value="Submit" id="submit">
+      <input type="reset" value="reset" class="button">
+      <input type="button" value="Submit" id="submit" class="button">
 
       </form>
     </div>

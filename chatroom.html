@@ -78,8 +78,9 @@
 
 	var cntlog=0;
 	var cntchat=0;
-
-	var now = new Date().getFullYear().toString()+"-"+new Date().getMonth().toString()+"-"+new Date().getDate().toString()+" "+new Date().getHours().toString()+":"+new Date().getMinutes().toString()+":"+new Date().getSeconds().toString();
+	
+	var month = new Date().getMonth()+1;
+	var now = new Date().getFullYear().toString()+"-"+month.toString()+"-"+new Date().getDate().toString()+" "+new Date().getHours().toString()+":"+new Date().getMinutes().toString()+":"+new Date().getSeconds().toString();
 	var username;
 	var nickname;
 	socket.on("who",function(){
@@ -132,6 +133,14 @@
 
 	socket.on('now', function(data) {
         	$('#date').text(data.date);
+	});
+
+        socket.on('sbc', function(who, time){
+		$('.msgs').append("<p class='mes'>"+who+" join the chat</p><p class='time'>"+time+"</p>");
+        });
+
+	socket.on('leave', function(who,time){
+		$('.msgs').append("<p class='mes'>"+who+" leave the chat</p><p class='time'>"+time+"</p>");
 	});
 
 </script>
